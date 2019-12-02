@@ -1,0 +1,17 @@
+dependencies {
+    api project(':common')
+    api "me.java.library:common:${meJavaLibraryVersion}"
+}
+
+android {
+    defaultConfig {
+        ndk {
+            moduleName "utils_speech"
+        }
+    }
+
+    sourceSets.main {
+        jni.srcDirs = []
+        jniLibs.srcDir 'libs'
+    }
+}

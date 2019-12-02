@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="titlebar_style">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?android:actionBarSize</item>
+        <item name="android:paddingLeft">15dp</item>
+        <item name="android:paddingRight">15dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">@color/default_background_title</item>
+    </style>
+
+    <style name="titlebar_divider_style">
+        <item name="android:background">@color/common_divide_background</item>
+        <item name="android:layout_height">1px</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="titlebar_icon_style">
+        <item name="android:layout_width">?android:actionBarSize</item>
+        <item name="android:layout_height">?android:actionBarSize</item>
+        <item name="android:background">@drawable/common_view_background_selector</item>
+        <item name="android:paddingTop">10dp</item>
+        <item name="android:paddingBottom">10dp</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:scaleType">centerInside</item>
+    </style>
+
+    <style name="titlebar_text_style">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@drawable/common_view_background_selector</item>
+        <item name="android:textColor">@color/titlebar_text_color_selector</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:ellipsize">none</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+    </style>
+
+    <style name="titlebar_title_style" parent="@style/titlebar_text_style">
+        <item name="android:textColor">@color/titlebar_title_color_selector</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">false</item>
+    </style>
+
+
+</resources>

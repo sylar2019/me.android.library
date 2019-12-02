@@ -1,0 +1,76 @@
+apply from: rootProject.rootDir.getAbsolutePath() + "/gradles/utils.gradle"
+/** ******************************************************************************************/
+
+ext {
+    gradlesPath = rootProject.rootDir.getAbsolutePath() + "/gradles/"
+    androidBuildToolsVersion = "29.0.1"
+    androidSupportV4 = "26.0.1"
+    androidAppcompatV7 = "28.0.0"
+    androidxAppcompat = "1.1.0"
+    androidMinSdkVersion = 22
+    androidTargetSdkVersion = 26
+    androidCompileSdkVersion = 28
+}
+
+/** ******************************************************************************************/
+
+/**
+ * 编译脚本
+ */
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://maven.aliyun.com/repository/jcenter/" }
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://maven.aliyun.com/repository/gradle-plugin/" }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.2'
+
+        //greenDAO
+        classpath 'org.greenrobot:greendao-gradle-plugin:3.2.2'
+
+        //butterknife
+        classpath 'com.jakewharton:butterknife-gradle-plugin:10.2.0'
+
+        //aop
+        classpath 'com.hujiang.aspectjx:gradle-android-plugin-aspectjx:2.0.8'
+    }
+}
+
+/** ******************************************************************************************/
+allprojects {
+    group rootProject.name
+    version "1.0.0"
+
+    repositories {
+        mavenLocal()
+        maven { url "https://maven.aliyun.com/repository/public" }
+        maven { url "https://maven.aliyun.com/repository/jcenter/" }
+        maven { url "https://maven.aliyun.com/repository/google" }
+        maven { url "https://mirrors.huaweicloud.com/repository/maven/" }
+        maven { url PUBLIC_REPOSITORY_URL }
+        maven { url 'https://jitpack.io' }
+    }
+
+    configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    }
+
+}
+
+subprojects {
+    configurations.all {
+        resolutionStrategy {
+            force "com.google.guava:guava:${guavaVersion}"
+            force "io.netty:netty-all:${nettyVersion}"
+        }
+    }
+}
+
+configure(getJavaProjects()) {
+    apply from: gradlesPath + "android.gradle"
+}
+/** ******************************************************************************************/

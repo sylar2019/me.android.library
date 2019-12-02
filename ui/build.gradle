@@ -1,0 +1,4 @@
+dependencies {
+    api project(':common')
+    api "com.android.support:appcompat-v7:" + rootProject.ext.androidAppcompatV7
+}

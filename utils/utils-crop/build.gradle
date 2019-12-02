@@ -1,0 +1,5 @@
+dependencies {
+    api project(":utils:utils-graphic")
+    implementation 'androidx.exifinterface:exifinterface:1.1.0-rc01'
+}
+

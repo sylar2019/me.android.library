@@ -1,0 +1,76 @@
+ext {
+    isAndroidApp = this.&isAndroidApp
+    isApp = this.&isApp
+    isAndroid = this.&isAndroid
+    isJava = this.&isJava
+
+    getLibProjects = this.&getLibProjects
+    getAppProjects = this.&getAppProjects
+    getJavaProjects = this.&getJavaProjects
+}
+
+def isAndroidApp() {
+    return isAndroid() && isApp()
+}
+
+def isApp() {
+    if (project.name.toLowerCase().equals("app")) {
+        return true
+    }
+    if (project.name.toLowerCase().endsWith("app")) {
+        return true
+    }
+    if (project.parent != null && project.parent.name.toLowerCase().equals("app")) {
+        return true
+    }
+    return false
+}
+
+def isAndroid() {
+    return new File(project.projectDir, "src/main/AndroidManifest.xml").exists()
+}
+
+def isJava() {
+    return new File(project.projectDir, "src").exists()
+}
+
+def getLibProjects() {
+    Set result = isJavaProject()
+    result.removeAll(isApp())
+    return result
+}
+
+def getAppProjects() {
+    Set result = isJavaProject()
+
+    Set set = getProjectsByName("app")
+    set.addAll(getProjectsByEndsWith("app"))
+    set.addAll(getProjectsByParentEquals("app"))
+
+    result.retainAll(set)
+    return result
+}
+
+def getProjectsByParentEquals(parentName) {
+    return subprojects.findAll {
+        it.parent != null && it.parent.name == parentName
+    }
+}
+
+def getProjectsByEndsWith(suffix) {
+    return subprojects.findAll {
+        it.name.endsWith(suffix)
+    }
+}
+
+def getProjectsByName(projectName) {
+    return subprojects.findAll {
+        it.name.equals(projectName)
+    }
+}
+
+def getJavaProjects() {
+    return subprojects.findAll {
+        it.childProjects.size() == 0 && new File(it.projectDir, "src").exists()
+    }
+}

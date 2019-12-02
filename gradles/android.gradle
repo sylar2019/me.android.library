@@ -1,0 +1,117 @@
+apply from: gradlesPath + 'const.gradle'
+apply from: gradlesPath + 'utils.gradle'
+apply plugin: 'maven'
+
+if (isAndroidApp()) {
+    apply plugin: "com.android.application"
+} else if (isAndroid()) {
+    apply plugin: "com.android.library"
+}
+
+/** ******************************************************************************************/
+
+dependencies {
+    api fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+
+    testImplementation "junit:junit:${junitVersion}"
+    testImplementation "org.robolectric:robolectric:4.3.1"
+    testImplementation 'org.mockito:mockito-core:3.1.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation('androidx.test.espresso:espresso-core:3.2.0')
+}
+
+/** ******************************************************************************************/
+
+android {
+    buildToolsVersion = rootProject.ext.androidBuildToolsVersion
+    compileSdkVersion = rootProject.ext.androidCompileSdkVersion
+
+    compileOptions {
+        targetCompatibility = 1.8
+        sourceCompatibility = 1.8
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.androidMinSdkVersion
+//        targetSdkVersion rootProject.ext.androidTargetSdkVersion
+        compileSdkVersion rootProject.ext.androidCompileSdkVersion
+        versionCode 100
+        versionName "1.0.0"
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            ldLibs "logFile", "z", "m"
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "x86-64"
+        }
+
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets', 'src/main/assets/']
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/dependencies.txt'
+        exclude 'META-INF/LGPL2.1'
+
+    }
+
+}
+
+/** ******************************************************************************************/
+/** ******************************************************************************************/
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            pom.groupId = "$project.group"
+            pom.artifactId = "$project.name"
+            pom.version = "$project.version"
+
+            def url = version.endsWith('SNAPSHOT') ? SNAPSHOT_REPOSITORY_URL : RELEASE_REPOSITORY_URL
+            repository(url: url) {
+                authentication(userName: NEXUS_USERNAME, password: NEXUS_PASSWORD)
+            }
+        }
+    }
+}
+
+task androidSourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.sourceFiles
+}
+artifacts {
+    archives androidSourcesJar
+}
+
+/** ******************************************************************************************/
+

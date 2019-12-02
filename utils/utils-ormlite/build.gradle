@@ -1,0 +1,6 @@
+dependencies {
+    api project(':common')
+
+    //ormLite
+    api 'com.j256.ormlite:ormlite-android:4.48'
+}

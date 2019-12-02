@@ -1,0 +1,29 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="me.android.library.utils.lbs.baidu">
+
+
+    <!-- 这个权限用于进行网络定位-->
+    <application>
+        <!--value: 开发者申请的key-->
+        <!--<meta-data-->
+        <!--android:name="com.baidu.lbsapi.API_KEY"-->
+        <!--android:value="O3etAc5QpHf9OUUDQhZa5tDl" />-->
+
+        <!--百度定位服务-->
+        <!--<service-->
+        <!--android:name="com.baidu.location.f"-->
+        <!--android:enabled="true"-->
+        <!--android:process=":remote" >-->
+        <!--<intent-filter>-->
+        <!--<action android:name="com.baidu.location.service_v2.2" >-->
+        <!--</action>-->
+        <!--</intent-filter>-->
+        <!--</service>-->
+    </application>
+
+    <!-- 这个权限用于访问GPS定位-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+</manifest>

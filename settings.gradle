@@ -1,0 +1,18 @@
+rootProject.name = "me.android.library"
+
+include ':common'
+include ':ui'
+
+include ":utils"
+include ":utils:utils-greendao"
+include ":utils:utils-ormlite"
+include ":utils:utils-http"
+include ":utils:utils-graphic"
+include ":utils:utils-lbs-baidu"
+include ":utils:utils-crop"
+include ":utils:utils-easylink"
+include ":utils:utils-qrcode"
+include ":utils:utils-rxtx"
+include ":utils:utils-speech"
+include ":utils:utils-sharesdk"
+include ":utils:utils-serialport"

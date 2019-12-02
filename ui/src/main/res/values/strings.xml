@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_title">string</string>
+    <string name="search_hint">输入拼音或字母缩写</string>
+
+    <!-- Common -->
+    <string name="common_ok">确定</string>
+    <string name="common_cancel">取消</string>
+    <string name="common_yes">是</string>
+    <string name="common_no">否</string>
+
+</resources>

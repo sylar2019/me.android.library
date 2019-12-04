@@ -21,7 +21,6 @@ import java.lang.ref.WeakReference;
 
 import me.android.library.common.enums.ConnectivityMode;
 import me.android.library.common.event.ConnectionModeChangedEvent;
-import me.android.library.common.utils.MemoryUtils;
 import me.android.library.common.utils.SoftInputUtils;
 import me.java.library.utils.base.guava.AsyncEventUtils;
 
@@ -106,8 +105,9 @@ abstract public class AbstractPage extends Fragment implements Page {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (rootView != null)
-            MemoryUtils.disposeView(rootView);
+        if (rootView != null) {
+//            MemoryUtils.disposeView(rootView);
+        }
     }
 
     @Override

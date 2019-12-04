@@ -1,6 +1,5 @@
 dependencies {
     api project(':common')
-    api "me.java.library:common:${meJavaLibraryVersion}"
 }
 
 android {

@@ -19,7 +19,7 @@
         <option name="ALLOW_USER_CONFIGURATION" value="false" />
         <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
         <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
-        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res" />
+        <option name="RES_FOLDERS_RELATIVE_PATH" value="file://$MODULE_DIR$/src/main/res;file://$MODULE_DIR$/build/generated/res/resValues/debug" />
         <option name="TEST_RES_FOLDERS_RELATIVE_PATH" value="" />
         <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
         <option name="PROJECT_TYPE" value="1" />
@@ -155,8 +155,8 @@
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.9.10@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.9.10@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:2.6@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.sylar2019.meJreLibs:common:1.0.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: com.github.sylar2019.meJreLibs:utils-base:1.0.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: meJreLibs:common:1.0.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: meJreLibs:utils-base:1.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: javax.validation:validation-api:2.0.1.Final@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.rholder:guava-retrying:2.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:28.1-android@jar" level="project" />

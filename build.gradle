@@ -42,7 +42,7 @@ buildscript {
 
 /** ******************************************************************************************/
 allprojects {
-    group 'com.github.sylar2019.meAndroidLibs'
+    group rootProject.name
     version "1.0.0"
 
     repositories {
@@ -55,15 +55,11 @@ allprojects {
         maven { url PUBLIC_REPOSITORY_URL }
 
     }
-
-    configurations.all {
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
-    }
-
 }
 
 subprojects {
     configurations.all {
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
         resolutionStrategy {
             force "com.google.guava:guava:${guavaVersion}"
             force "io.netty:netty-all:${nettyVersion}"

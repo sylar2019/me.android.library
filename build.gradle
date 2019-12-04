@@ -42,7 +42,7 @@ buildscript {
 
 /** ******************************************************************************************/
 allprojects {
-    group rootProject.name
+    group 'com.github.sylar2019.meAndroidLibs'
     version "1.0.0"
 
     repositories {
@@ -51,8 +51,9 @@ allprojects {
         maven { url "https://maven.aliyun.com/repository/jcenter/" }
         maven { url "https://maven.aliyun.com/repository/google" }
         maven { url "https://mirrors.huaweicloud.com/repository/maven/" }
-        maven { url PUBLIC_REPOSITORY_URL }
         maven { url 'https://jitpack.io' }
+        maven { url PUBLIC_REPOSITORY_URL }
+
     }
 
     configurations.all {

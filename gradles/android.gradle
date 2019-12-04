@@ -4,6 +4,7 @@ apply plugin: 'maven'
 
 if (isAndroidApp()) {
     apply plugin: "com.android.application"
+
 } else if (isAndroid()) {
     apply plugin: "com.android.library"
 }
@@ -82,7 +83,6 @@ android {
         exclude 'META-INF/license.txt'
         exclude 'META-INF/dependencies.txt'
         exclude 'META-INF/LGPL2.1'
-
     }
 
 }

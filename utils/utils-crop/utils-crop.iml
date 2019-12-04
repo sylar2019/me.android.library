@@ -155,8 +155,8 @@
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy:1.9.10@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: net.bytebuddy:byte-buddy-agent:1.9.10@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.objenesis:objenesis:2.6@jar" level="project" />
-    <orderEntry type="library" name="Gradle: me.java.library:common:1.0.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: me.java.library:utils-base:1.0.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.sylar2019.meJreLibs:common:1.0.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.github.sylar2019.meJreLibs:utils-base:1.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: javax.validation:validation-api:2.0.1.Final@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.rholder:guava-retrying:2.0.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:28.1-android@jar" level="project" />
@@ -173,7 +173,7 @@
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.9.7@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.nostra13.universalimageloader:universal-image-loader:1.9.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.1.0@jar" level="project" />
-    <orderEntry type="library" name="Gradle: androidx.exifinterface:exifinterface:1.1.0-rc01@aar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.exifinterface:exifinterface:1.1.0@aar" level="project" />
     <orderEntry type="module" module-name="utils-graphic" />
     <orderEntry type="module" module-name="common" />
   </component>

@@ -1,4 +1,4 @@
-rootProject.name = "me.android.library"
+rootProject.name = "meAndroidLibs"
 
 include ':common'
 include ':ui'

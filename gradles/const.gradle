@@ -6,7 +6,7 @@ ext {
     jodatimeVersion = "2.9.9"
     guavaVersion = "28.1-android"
     nettyVersion = "4.1.43.Final"
-    meJavaLibraryVersion = "1.0.0"
-    meAndroidLibraryVersion = "1.0.0"
+    meJavaLibraryVersion = "1.0.0-SNAPSHOT"
+    meAndroidLibraryVersion = "1.0.0-SNAPSHOT"
     meAndroidxThridLibraryVersion = "1.0.0"
 }

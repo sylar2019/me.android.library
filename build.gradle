@@ -43,7 +43,7 @@ buildscript {
 /** ******************************************************************************************/
 allprojects {
     group rootProject.name
-    version "1.0.0"
+    version "1.0.0-SNAPSHOT"
 
     repositories {
         mavenLocal()
@@ -59,7 +59,6 @@ allprojects {
 
 subprojects {
     configurations.all {
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
         resolutionStrategy {
             force "com.google.guava:guava:${guavaVersion}"
             force "io.netty:netty-all:${nettyVersion}"
@@ -71,3 +70,9 @@ configure(getJavaProjects()) {
     apply from: gradlesPath + "android.gradle"
 }
 /** ******************************************************************************************/
+
+//不使用缓存，使用仓库中最新的包
+configurations.all {
+    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds' // 动态版本 x.x.+
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'//  变化版本 x.x.x
+}

@@ -45,12 +45,14 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
 
     protected void onNewest(AppVersion appVer) {
         // 有新版本
-        download(appVer.getDownloadUrl(), "版本更新", null);
+        download(appVer.getDownloadUrl(), "版本更新", appVer.getVersionDescription());
     }
 
     protected void download(String downUrl, String title, String description) {
         try {
-            DownloadService.newAppDownloadTask(cx, getClass().getSimpleName(),
+            DownloadService.newAppDownloadTask(
+                    cx,
+                    getClass().getSimpleName(),
                     downUrl).download(apkName, title, description);
         } catch (Exception e) {
             e.printStackTrace();

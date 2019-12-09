@@ -5,6 +5,10 @@ package me.android.library.utils.http;
  */
 public interface AppVersion {
 
+    int getTerminalType();
+
+    int getProductType();
+
     int getVersionCode();
 
     String getVersionName();

@@ -13,14 +13,10 @@ import me.java.library.common.Callback;
 public abstract class AbstractReportLogService extends AbstractService {
 
     public final static String LOG_TYPE_CRASH = "crash";
-    protected CrashLogService.OnCrashedListener crashedListener = new CrashLogService.OnCrashedListener() {
+    protected CrashLogService.OnCrashedListener crashedListener = log -> {
 
-        @Override
-        public void onCrashed(String log) {
-
-            if (!AppUtils.isDebug(cx)) {
-                reportLog(LOG_TYPE_CRASH, log, null);
-            }
+        if (!AppUtils.isDebug(cx)) {
+            reportLog(LOG_TYPE_CRASH, log, null);
         }
     };
 

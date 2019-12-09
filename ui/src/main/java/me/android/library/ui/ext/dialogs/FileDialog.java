@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
@@ -23,6 +24,8 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import me.android.library.common.utils.ToastUtils;
 import me.android.library.common.utils.ViewUtils;
@@ -36,7 +39,7 @@ public class FileDialog {
     static final public String sParent = "build/generated/source/r/androidTest";
 
     static public AlertDialog openFile(Context cx, String title,
-                                       final OpenFileCallback callback) {
+                                       final OpenFileCallback callback, String... filters) {
         AlertDialog.Builder builder = DialogHelper.newBuilder(cx, title);
         final AlertDialog dlg = builder.create();
 
@@ -50,10 +53,10 @@ public class FileDialog {
                                     int position, long id) {
                 FileItem fi = adapter.getEntity(position);
                 if (fi instanceof ParentFileItem) {
-                    adapter.load(fi.file.getParentFile());
+                    adapter.load(fi.file.getParentFile(), filters);
                 } else {
                     if (fi.isDirectory()) {
-                        adapter.load(fi.file);
+                        adapter.load(fi.file, filters);
                     } else {
                         if (callback != null) {
                             dlg.dismiss();
@@ -64,9 +67,8 @@ public class FileDialog {
             }
         });
 
-
         dlg.setView(listView);
-        adapter.load(Environment.getExternalStorageDirectory());
+        adapter.load(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filters);
         dlg.show();
 
         return dlg;
@@ -185,7 +187,18 @@ public class FileDialog {
             return file;
         }
 
-        public void load(File file) {
+        private String getRegex(String... filters) {
+            List<String> list = Lists.newArrayList();
+            for (String filter : filters) {
+                filter = filter.replace("*", "").replace(".", "");
+                list.add("." + filter);
+            }
+
+            String str = Joiner.on("|").join(list).toLowerCase();
+            return String.format(".+(%s)$", str);
+        }
+
+        public void load(File file, String... filters) {
             File[] files = file.listFiles();
             if (files == null)
                 return;
@@ -196,8 +209,18 @@ public class FileDialog {
             loadData(list);
 
             for (File f : files) {
-                if (f.isDirectory() || f.isFile()) {
+                if (f.isDirectory()) {
                     list.add(new FileItem(f));
+                } else if (f.isFile()) {
+                    if (filters != null) {
+                        String reg = getRegex(filters);
+                        Matcher matcher = Pattern.compile(reg).matcher(f.getName());
+                        if (matcher.matches()) {
+                            list.add(new FileItem(f));
+                        }
+                    } else {
+                        list.add(new FileItem(f));
+                    }
                 }
             }
 

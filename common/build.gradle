@@ -1,4 +1,4 @@
 dependencies {
     api("meJreLibs:common:${meJavaLibraryVersion}")
-//    api "com.github.sylar2019.meJreLibs:common:${meJavaLibraryVersion}"
+    api "androidx.appcompat:appcompat:" + rootProject.ext.androidxAppcompat
 }

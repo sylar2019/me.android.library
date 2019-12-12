@@ -13,6 +13,8 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
+import androidx.core.content.FileProvider;
+
 import com.google.common.collect.Iterables;
 
 import java.io.File;
@@ -263,6 +265,15 @@ public class PackageUtils {
         throw new AssertionError();
     }
 
+    public static String getApplicationId(Context cx) {
+        PackageManager pm = cx.getPackageManager();
+        try {
+            return pm.getApplicationInfo(cx.getPackageName(), 0).processName;
+        } catch (NameNotFoundException e) {
+            return null;
+        }
+    }
+
     public static int getVersionCode(Context cx) {
         PackageManager pm = cx.getPackageManager();
         try {
@@ -288,6 +299,24 @@ public class PackageUtils {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         cx.startActivity(intent);
+    }
+
+    public static void installApk(Context context, File file, String authority) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+        Uri data;
+        // 判断版本大于等于7.0
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            data = FileProvider.getUriForFile(context, authority, file);
+            // 给目标应用一个临时授权
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        } else {
+            data = Uri.fromFile(file);
+        }
+        intent.setDataAndType(data, "application/vnd.android.package-archive");
+        context.startActivity(intent);
     }
 
     /**
@@ -321,7 +350,7 @@ public class PackageUtils {
     public static boolean installNormal(Context context, String filePath) {
         Intent i = new Intent(Intent.ACTION_VIEW);
         File file = new File(filePath);
-        if (file == null || !file.exists() || !file.isFile()
+        if (!file.exists() || !file.isFile()
                 || file.length() <= 0) {
             return false;
         }
@@ -332,6 +361,7 @@ public class PackageUtils {
         context.startActivity(i);
         return true;
     }
+
 
     /**
      * install package silent by root

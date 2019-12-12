@@ -22,7 +22,6 @@ import com.google.common.collect.Lists;
 
 import java.io.File;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,32 +35,28 @@ import me.android.library.ui.ext.adapters.ExtBaseAdapter;
 @SuppressLint("InflateParams")
 public class FileDialog {
 
-    static final public String sParent = "build/generated/source/r/androidTest";
+    static final public String sParent = "..";
 
     static public AlertDialog openFile(Context cx, String title,
-                                       final OpenFileCallback callback, String... filters) {
+                                       OpenFileCallback callback,
+                                       String... filters) {
         AlertDialog.Builder builder = DialogHelper.newBuilder(cx, title);
         final AlertDialog dlg = builder.create();
 
         final Adapter adapter = new Adapter(cx);
         ListView listView = new ListView(cx);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                FileItem fi = adapter.getEntity(position);
-                if (fi instanceof ParentFileItem) {
-                    adapter.load(fi.file.getParentFile(), filters);
+        listView.setOnItemClickListener((parent, view, position, id) -> {
+            FileItem fi = adapter.getEntity(position);
+            if (fi instanceof ParentFileItem) {
+                adapter.load(fi.file.getParentFile(), filters);
+            } else {
+                if (fi.isDirectory()) {
+                    adapter.load(fi.file, filters);
                 } else {
-                    if (fi.isDirectory()) {
-                        adapter.load(fi.file, filters);
-                    } else {
-                        if (callback != null) {
-                            dlg.dismiss();
-                            callback.onOpen(fi.file);
-                        }
+                    if (callback != null) {
+                        dlg.dismiss();
+                        callback.onOpen(fi.file);
                     }
                 }
             }
@@ -170,7 +165,7 @@ public class FileDialog {
 
         @Override
         public String getDesc() {
-            return "返回父目录";
+            return "返回上级目录";
         }
     }
 
@@ -209,38 +204,36 @@ public class FileDialog {
             loadData(list);
 
             for (File f : files) {
-                if (f.isDirectory()) {
-                    list.add(new FileItem(f));
-                } else if (f.isFile()) {
-                    if (filters != null) {
-                        String reg = getRegex(filters);
-                        Matcher matcher = Pattern.compile(reg).matcher(f.getName());
-                        if (matcher.matches()) {
+                if (!f.isHidden()) {
+                    if (f.isDirectory()) {
+                        list.add(new FileItem(f));
+                    } else if (f.isFile()) {
+                        if (filters != null) {
+                            String reg = getRegex(filters);
+                            Matcher matcher = Pattern.compile(reg).matcher(f.getName());
+                            if (matcher.matches()) {
+                                list.add(new FileItem(f));
+                            }
+                        } else {
                             list.add(new FileItem(f));
                         }
-                    } else {
-                        list.add(new FileItem(f));
                     }
                 }
             }
 
-            Collections.sort(list, new Comparator<FileItem>() {
-
-                @Override
-                public int compare(FileItem lhs, FileItem rhs) {
-                    int i = 0;
-                    if (lhs.isDirectory() && rhs.isDirectory()) {
-                        i = ComparisonChain.start()
-                                .compare(lhs.getName(), rhs.getName()).result();
+            Collections.sort(list, (lhs, rhs) -> {
+                int i = 0;
+                if (lhs.isDirectory() && rhs.isDirectory()) {
+                    i = ComparisonChain.start()
+                            .compare(lhs.getName(), rhs.getName()).result();
+                } else {
+                    if (lhs.isDirectory()) {
+                        i = -1;
                     } else {
-                        if (lhs.isDirectory()) {
-                            i = -1;
-                        } else {
-                            i = 1;
-                        }
+                        i = 1;
                     }
-                    return i;
                 }
+                return i;
             });
 
             if (file.getParentFile() != null) {

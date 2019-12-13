@@ -8,8 +8,6 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -28,9 +26,10 @@ import java.util.regex.Pattern;
 
 import me.android.library.common.utils.ToastUtils;
 import me.android.library.common.utils.ViewUtils;
-import me.android.library.ui.R;
 import me.android.library.ui.ext.OkCancelCallback;
 import me.android.library.ui.ext.adapters.ExtBaseAdapter;
+
+import static android.os.Environment.DIRECTORY_DOWNLOADS;
 
 @SuppressLint("InflateParams")
 public class FileDialog {
@@ -63,7 +62,7 @@ public class FileDialog {
         });
 
         dlg.setView(listView);
-        adapter.load(Environment.getExternalStorageDirectory(), filters);
+        adapter.load(Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), filters);
         dlg.show();
 
         return dlg;
@@ -74,23 +73,18 @@ public class FileDialog {
         final Adapter adapter = new Adapter(cx);
         adapter.load(Environment.getExternalStorageDirectory());
 
-        View view = LayoutInflater.from(cx).inflate(R.layout.dialog_file, null);
-        ListView listView = view.findViewById(R.id.lvFiles);
-        final EditText edtFileName = view.findViewById(R.id.edtFileName);
+        View view = LayoutInflater.from(cx).inflate(me.android.library.ui.R.layout.dialog_file, null);
+        ListView listView = view.findViewById(me.android.library.ui.R.id.lvFiles);
+        final EditText edtFileName = view.findViewById(me.android.library.ui.R.id.edtFileName);
         edtFileName.setText(defaultName);
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                                    int position, long id) {
-                FileItem fi = (FileItem) adapter.getItem(position);
-                if (fi instanceof ParentFileItem) {
-                    adapter.load(fi.file.getParentFile());
-                } else {
-                    if (fi.isDirectory()) {
-                        adapter.load(fi.file);
-                    }
+        listView.setOnItemClickListener((parent, view1, position, id) -> {
+            FileItem fi = (FileItem) adapter.getItem(position);
+            if (fi instanceof ParentFileItem) {
+                adapter.load(fi.file.getParentFile());
+            } else {
+                if (fi.isDirectory()) {
+                    adapter.load(fi.file);
                 }
             }
         });
@@ -194,15 +188,18 @@ public class FileDialog {
         }
 
         public void load(File file, String... filters) {
-            File[] files = file.listFiles();
-            if (files == null)
-                return;
-
             this.file = file;
 
-            List<FileItem> list = Lists.newArrayList();
-            loadData(list);
+            List<File> files = Lists.newArrayList();
 
+            if (file.exists() && file.isDirectory()) {
+                File[] children = file.listFiles();
+                if (children != null) {
+                    files.addAll(Lists.newArrayList(children));
+                }
+            }
+
+            List<FileItem> list = Lists.newArrayList();
             for (File f : files) {
                 if (!f.isHidden()) {
                     if (f.isDirectory()) {
@@ -222,10 +219,9 @@ public class FileDialog {
             }
 
             Collections.sort(list, (lhs, rhs) -> {
-                int i = 0;
+                int i;
                 if (lhs.isDirectory() && rhs.isDirectory()) {
-                    i = ComparisonChain.start()
-                            .compare(lhs.getName(), rhs.getName()).result();
+                    i = ComparisonChain.start().compare(lhs.getName(), rhs.getName()).result();
                 } else {
                     if (lhs.isDirectory()) {
                         i = -1;
@@ -249,7 +245,7 @@ public class FileDialog {
             ViewHoler vh;
             if (convertView == null) {
                 convertView = LayoutInflater.from(cx).inflate(
-                        R.layout.dialog_file_item, parent, false);
+                        me.android.library.ui.R.layout.dialog_file_item, parent, false);
                 vh = new ViewHoler(convertView);
                 convertView.setTag(vh);
             } else {
@@ -269,14 +265,14 @@ public class FileDialog {
             TextView txtDesc;
 
             public ViewHoler(View view) {
-                img = view.findViewById(R.id.imgItem);
-                txtName = view.findViewById(R.id.txtName);
-                txtDesc = view.findViewById(R.id.txtDesc);
+                img = view.findViewById(me.android.library.ui.R.id.imgItem);
+                txtName = view.findViewById(me.android.library.ui.R.id.txtName);
+                txtDesc = view.findViewById(me.android.library.ui.R.id.txtDesc);
             }
 
             public void showItem(FileItem item) {
-                img.setImageResource(item.isDirectory() ? R.mipmap.ic_filedialog_folder
-                        : R.mipmap.ic_filedialog_file);
+                img.setImageResource(item.isDirectory() ? me.android.library.ui.R.mipmap.ic_filedialog_folder
+                        : me.android.library.ui.R.mipmap.ic_filedialog_file);
                 txtName.setText(item.getName());
                 txtDesc.setText(item.getDesc());
             }

@@ -1,7 +1,9 @@
 package me.android.library.common.utils;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -301,23 +303,47 @@ public class PackageUtils {
         cx.startActivity(intent);
     }
 
-    public static void installApk(Context context, File file, String authority) {
+    public static final int REQUEST_CODE_UNKNOWN_APP = 1000;
+
+    public static void installApk(Activity activity, File file, String authority) {
+        Uri uri = Uri.fromFile(file);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            // 判断版本大于等于7.0
+            uri = FileProvider.getUriForFile(activity, authority, file);
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // 判断版本大于等于8.0
+            boolean hasInstallPermission = activity.getPackageManager().canRequestPackageInstalls();
+            if (hasInstallPermission) {
+                //安装应用
+                installApk(activity, uri);
+            } else {
+                //跳转至“安装未知应用”权限界面，引导用户开启权限
+                uri = Uri.parse("package:" + activity.getPackageName());
+                Intent intent = new Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, uri);
+                ClipData clipData = ClipData.newRawUri("uri", uri);
+                intent.setClipData(clipData);
+
+                activity.startActivityForResult(intent, REQUEST_CODE_UNKNOWN_APP);
+            }
+        } else {
+            installApk(activity, uri);
+        }
+    }
+
+    public static void installApk(Activity activity, Uri uri) {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
-        Uri data;
-        // 判断版本大于等于7.0
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            data = FileProvider.getUriForFile(context, authority, file);
-            // 给目标应用一个临时授权
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        } else {
-            data = Uri.fromFile(file);
-        }
-        intent.setDataAndType(data, "application/vnd.android.package-archive");
-        context.startActivity(intent);
+        // 给目标应用一个临时授权
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+        intent.setDataAndType(uri, "application/vnd.android.package-archive");
+        activity.startActivity(intent);
     }
+
 
     /**
      * install according conditions

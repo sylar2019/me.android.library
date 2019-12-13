@@ -1,6 +1,8 @@
 package me.android.library.ui;
 
+import android.content.ClipData;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,6 +12,7 @@ import android.view.View;
 
 import androidx.fragment.app.FragmentActivity;
 
+import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.Subscribe;
 
 import me.android.library.common.App;
@@ -17,6 +20,7 @@ import me.android.library.common.enums.ConnectivityMode;
 import me.android.library.common.event.ActivityResultEvent;
 import me.android.library.common.event.ConnectionModeChangedEvent;
 import me.android.library.common.utils.MemoryUtils;
+import me.android.library.common.utils.PackageUtils;
 import me.java.library.utils.base.guava.AsyncEventUtils;
 
 
@@ -86,9 +90,31 @@ public abstract class AbstractActivity extends FragmentActivity implements Form 
         AsyncEventUtils.postEvent(new ActivityResultEvent(this, activityResult));
     }
 
+    @AllowConcurrentEvents
     @Subscribe
     public void onEvent(ConnectionModeChangedEvent event) {
         onConnectionModeChanged(event.getContent());
+    }
+
+    @AllowConcurrentEvents
+    @Subscribe
+    public void onEvent(ActivityResultEvent event) {
+        int requestCode = event.getContent().getRequestCode();
+        switch (requestCode) {
+            case PackageUtils.REQUEST_CODE_UNKNOWN_APP:
+                try {
+                    ClipData clipData = event.getContent().getIntent().getClipData();
+                    if (clipData != null && clipData.getItemCount() > 0) {
+                        Uri uri = clipData.getItemAt(0).getUri();
+                        PackageUtils.installApk(this, uri);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     protected void onConnectionModeChanged(ConnectivityMode mode) {

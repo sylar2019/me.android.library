@@ -1,5 +1,6 @@
 package me.android.library.utils.http;
 
+import android.app.Activity;
 import android.content.Context;
 
 import me.android.library.common.service.AbstractService;
@@ -22,14 +23,14 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
         apkName = cx.getPackageName() + ".apk";
     }
 
-    public void checkAndUpgrade() {
+    public void checkAndUpgrade(Activity activity) {
         checkVersion(new Callback<AppVersion>() {
             @Override
             public void onSuccess(AppVersion appVer) {
                 int curCode = PackageUtils.getVersionCode(cx);
 
                 if (appVer.getVersionCode() > curCode) {
-                    onNewest(appVer);
+                    onNewest(activity, appVer);
                 } else {
                     onWithout();
                 }
@@ -42,16 +43,15 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
         });
     }
 
-
-    protected void onNewest(AppVersion appVer) {
+    protected void onNewest(Activity activity, AppVersion appVer) {
         // 有新版本
-        download(appVer.getDownloadUrl(), "版本更新", appVer.getVersionDescription());
+        download(activity, appVer.getDownloadUrl(), "版本更新", appVer.getVersionDescription());
     }
 
-    protected void download(String downUrl, String title, String description) {
+    protected void download(Activity activity, String downUrl, String title, String description) {
         try {
             DownloadService.newAppDownloadTask(
-                    cx,
+                    activity,
                     getClass().getSimpleName(),
                     downUrl).download(apkName, title, description);
         } catch (Exception e) {

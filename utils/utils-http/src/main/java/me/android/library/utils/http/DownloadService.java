@@ -1,5 +1,6 @@
 package me.android.library.utils.http;
 
+import android.app.Activity;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
 import android.content.BroadcastReceiver;
@@ -51,7 +52,12 @@ public class DownloadService {
             if (uri == null)
                 return;
 
-            PackageUtils.installApk(cx, uri);
+            if (cx instanceof Activity) {
+                Activity activity = (Activity) cx;
+                PackageUtils.installApk(activity, uri);
+            } else {
+                PackageUtils.installApk(cx, uri);
+            }
         }
     }
 

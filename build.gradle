@@ -62,7 +62,10 @@ subprojects {
         resolutionStrategy {
             force "com.google.guava:guava:${guavaVersion}"
             force "io.netty:netty-all:${nettyVersion}"
-            force "com.android.support:appcompat-v7:" + rootProject.ext.androidAppcompatV7
+
+            force("com.fasterxml.jackson.core:jackson-core:${jacksonVersion}")
+            force("com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}")
+            force("com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}")
         }
     }
 }

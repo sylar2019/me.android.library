@@ -1,7 +1,9 @@
 ext {
     //统一定义依赖组件版本号
     aspectjVersion = "1.9.4"
+
     junitVersion = "4.12"
+
     jacksonVersion = "2.9.7"
     jodatimeVersion = "2.9.9"
     guavaVersion = "28.1-android"

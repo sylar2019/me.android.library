@@ -63,7 +63,7 @@ public class FileDialog {
         });
 
         dlg.setView(listView);
-        adapter.load(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), filters);
+        adapter.load(Environment.getExternalStorageDirectory(), filters);
         dlg.show();
 
         return dlg;

@@ -206,5 +206,7 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="utils-graphic" />
     <orderEntry type="module" module-name="common" />
+    <orderEntry type="module" module-name="utils-graphic" />
+    <orderEntry type="module" module-name="common" />
   </component>
 </module>

@@ -223,5 +223,7 @@
     <orderEntry type="module" module-name="common" />
     <orderEntry type="module" module-name="utils-http" />
     <orderEntry type="module" module-name="common" />
+    <orderEntry type="module" module-name="utils-http" />
+    <orderEntry type="module" module-name="common" />
   </component>
 </module>

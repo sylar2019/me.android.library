@@ -59,6 +59,9 @@ allprojects {
 
 subprojects {
     configurations.all {
+        //不使用缓存，使用仓库中最新的包
+        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds' // 动态版本 x.x.+
+        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'//  变化版本 x.x.x
         resolutionStrategy {
             force "com.google.guava:guava:${guavaVersion}"
             force "io.netty:netty-all:${nettyVersion}"
@@ -75,8 +78,3 @@ configure(getJavaProjects()) {
 }
 /** ******************************************************************************************/
 
-//不使用缓存，使用仓库中最新的包
-configurations.all {
-    resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds' // 动态版本 x.x.+
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'//  变化版本 x.x.x
-}

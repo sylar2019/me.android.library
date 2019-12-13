@@ -2,6 +2,11 @@ package me.android.library.utils.http;
 
 import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
+
+import com.google.common.base.Preconditions;
+
+import java.io.File;
 
 import me.android.library.common.service.AbstractService;
 import me.android.library.common.utils.PackageUtils;
@@ -43,20 +48,17 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
         });
     }
 
-    protected void onNewest(Activity activity, AppVersion appVer) {
-        // 有新版本
-        download(activity, appVer.getDownloadUrl(), "版本更新", appVer.getVersionDescription());
+    public void installFromLocal(Activity activity, File file) {
+        Preconditions.checkNotNull(file, "安装文件无效");
+        Preconditions.checkState(file.getName().toLowerCase().endsWith(".apk"), "不是安装文件");
+        String authority = getProviderAuthority();
+        PackageUtils.installApk(activity, file, authority);
+
     }
 
-    protected void download(Activity activity, String downUrl, String title, String description) {
-        try {
-            DownloadService.newAppDownloadTask(
-                    activity,
-                    getClass().getSimpleName(),
-                    downUrl).download(apkName, title, description);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    protected void onNewest(Activity activity, AppVersion appVer) {
+        // 有新版本
+        download(activity, appVer);
     }
 
     protected void onWithout() {
@@ -67,5 +69,20 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
     protected void onCheckFailure(Throwable t) {
         // 检查版本出错
         ToastUtils.showShort("检查更新失败");
+    }
+
+    protected void download(Activity activity, AppVersion appVer) {
+        DownloadService.newFileDownloadTask(activity,
+                getClass().getSimpleName(),
+                appVer.getDownloadUrl(),
+                uri -> afterDownload(activity, appVer, uri));
+    }
+
+    protected void afterDownload(Activity activity, AppVersion appVer, Uri uri) {
+        installFromLocal(activity, new File(uri.getPath()));
+    }
+
+    protected String getProviderAuthority() {
+        return String.format("%s.provider", PackageUtils.getApplicationId(cx));
     }
 }

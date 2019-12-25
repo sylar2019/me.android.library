@@ -41,9 +41,23 @@ public class RestfulService extends AbstractService {
     private ObjectMapper objectMapper;
     private Map<String, List<Cookie>> cookieStore = Maps.newHashMap();
     private Map<String, Retrofit> map = Maps.newHashMap();
+    private CookieJar cookieJar = new CookieJar() {
+        @Override
+        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+            cookieStore.put(url.host(), cookies);
+        }
+
+        @Override
+        public List<Cookie> loadForRequest(HttpUrl url) {
+            List<Cookie> cookies = cookieStore.get(url.host());
+            return cookies != null ? cookies : Lists.newArrayList();
+        }
+    };
 
     private RestfulService() {
 
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
         Interceptor headerInterceptor = chain -> {
             // 以拦截到的请求为基础创建一个新的请求对象，然后插入Header
             Request request = chain.request().newBuilder()
@@ -56,18 +70,13 @@ public class RestfulService extends AbstractService {
 
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
                 .cookieJar(cookieJar)
+                .addInterceptor(loggingInterceptor)
                 .addInterceptor(headerInterceptor)
 //                .connectTimeout(100, TimeUnit.SECONDS)
 //                .writeTimeout(100, TimeUnit.SECONDS)
 //                .readTimeout(100, TimeUnit.SECONDS)
 //                .retryOnConnectionFailure(true)
                 ;
-
-        if (BuildConfig.DEBUG) {
-            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
-            loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
-            builder.addInterceptor(loggingInterceptor);
-        }
 
         client = builder.build();
 
@@ -155,18 +164,4 @@ public class RestfulService extends AbstractService {
     private static class SingletonHolder {
         private static RestfulService instance = new RestfulService();
     }
-
-
-    private CookieJar cookieJar = new CookieJar() {
-        @Override
-        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
-            cookieStore.put(url.host(), cookies);
-        }
-
-        @Override
-        public List<Cookie> loadForRequest(HttpUrl url) {
-            List<Cookie> cookies = cookieStore.get(url.host());
-            return cookies != null ? cookies : Lists.newArrayList();
-        }
-    };
 }

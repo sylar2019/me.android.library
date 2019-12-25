@@ -262,6 +262,7 @@ public class PackageUtils {
      * uninstall fail if permission denied
      */
     public static final int DELETE_FAILED_PERMISSION_DENIED = -4;
+    public static final int REQUEST_CODE_UNKNOWN_APP = 1000;
 
     private PackageUtils() {
         throw new AssertionError();
@@ -302,8 +303,6 @@ public class PackageUtils {
         intent.setDataAndType(uri, "application/vnd.android.package-archive");
         cx.startActivity(intent);
     }
-
-    public static final int REQUEST_CODE_UNKNOWN_APP = 1000;
 
     public static void installApk(Activity activity, File file, String authority) {
         Uri uri = Uri.fromFile(file);

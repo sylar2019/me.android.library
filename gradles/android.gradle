@@ -34,7 +34,7 @@ android {
 
     defaultConfig {
         minSdkVersion rootProject.ext.androidMinSdkVersion
-//        targetSdkVersion rootProject.ext.androidTargetSdkVersion
+        targetSdkVersion rootProject.ext.androidTargetSdkVersion
         compileSdkVersion rootProject.ext.androidCompileSdkVersion
         versionCode 100
         versionName "1.0.0"

@@ -28,22 +28,29 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
         apkName = cx.getPackageName() + ".apk";
     }
 
-    public void checkAndUpgrade(Activity activity) {
+    public void checkAndUpgrade(Activity activity, Callback<AppVersion> callback) {
         checkVersion(new Callback<AppVersion>() {
             @Override
             public void onSuccess(AppVersion appVer) {
                 int curCode = PackageUtils.getVersionCode(cx);
 
-                if (appVer.getVersionCode() > curCode) {
-                    onNewest(activity, appVer);
-                } else {
-                    onWithout();
+                try {
+                    if (appVer.getVersionCode() > curCode) {
+                        onNewest(activity, appVer);
+                    } else {
+                        onWithout();
+                    }
+
+                    callback.onSuccess(appVer);
+                } catch (Exception e) {
+                    callback.onFailure(e);
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
                 onCheckFailure(t);
+                callback.onFailure(t);
             }
         });
     }
@@ -56,7 +63,7 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
 
     }
 
-    protected void onNewest(Activity activity, AppVersion appVer) {
+    protected void onNewest(Activity activity, AppVersion appVer) throws Exception {
         // 有新版本
         download(activity, appVer);
     }
@@ -71,11 +78,11 @@ public abstract class AbstractAppUpgradeService extends AbstractService {
         ToastUtils.showShort("检查更新失败");
     }
 
-    protected void download(Activity activity, AppVersion appVer) {
+    protected void download(Activity activity, AppVersion appVer) throws Exception {
         DownloadService.newFileDownloadTask(activity,
                 getClass().getSimpleName(),
                 appVer.getDownloadUrl(),
-                uri -> afterDownload(activity, appVer, uri));
+                uri -> afterDownload(activity, appVer, uri)).download(apkName, "app download...");
     }
 
     protected void afterDownload(Activity activity, AppVersion appVer, Uri uri) {

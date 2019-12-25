@@ -2,7 +2,12 @@ dependencies {
     api project(':common')
 
     //okhttp 2.2.0 可以避免 post without body 的异常
-    api 'com.squareup.okhttp:okhttp:2.2.0'
-    api 'com.squareup.retrofit:retrofit:1.9.0'
-    api 'com.squareup.retrofit:converter-jackson:1.9.0'
+//    api 'com.squareup.okhttp:okhttp:2.2.0'
+//    api 'com.squareup.retrofit:retrofit:1.9.0'
+//    api 'com.squareup.retrofit:converter-jackson:1.9.0'
+
+    api "com.squareup.okhttp3:okhttp:${okhttpVersion}"
+    api "com.squareup.okhttp3:logging-interceptor:${okhttpVersion}"
+    api "com.squareup.retrofit2:retrofit:${retrofit2Version}"
+    api "com.squareup.retrofit2:converter-jackson:${retrofit2Version}"
 }

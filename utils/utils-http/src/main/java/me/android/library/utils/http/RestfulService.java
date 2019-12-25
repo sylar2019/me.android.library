@@ -1,97 +1,98 @@
 package me.android.library.utils.http;
 
 import android.net.Uri;
-import android.util.Log;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.CookieHandler;
+import java.util.List;
 import java.util.Map;
-
-import javax.net.ssl.SSLContext;
 
 import me.android.library.common.Helper;
 import me.android.library.common.service.AbstractService;
-import me.android.library.common.utils.AppUtils;
 import me.android.library.common.utils.StorageUtils;
 import me.java.library.common.Callback;
 import me.java.library.utils.base.FileUtils;
-import retrofit.RestAdapter;
-import retrofit.client.OkClient;
-import retrofit.converter.JacksonConverter;
+import okhttp3.Call;
+import okhttp3.Cookie;
+import okhttp3.CookieJar;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.jackson.JacksonConverterFactory;
 
 public class RestfulService extends AbstractService {
 
-    private static final String TAG = "rest";
-    private static RestfulService instance = new RestfulService();
     private String defaultHost;
     private OkHttpClient client;
-    private boolean isSsl;
-    private RestfulCookieManager restfulCookieManager;
-    private Map<String, RestAdapter> map = Maps.newHashMap();
-    private RestAdapter.Log restLog = new RestAdapter.Log() {
-        @Override
-        public void log(String msg) {
-            String[] blacklist = {"Access-Control", "Cache-Control", "Connection", "Content-Type",
-                    "Keep-Alive", "Pragma", "Server", "Vary", "X-Powered-By",
-                    "Content-Length", "Date", "Transfer-Encoding", "OkHttp",
-                    "X-AspNet",
-                    "---> END", "<--- HTTP 200", "<--- END", "status:200"};
-            for (String bString : blacklist) {
-                if (msg.startsWith(bString)) {
-                    return;
-                }
-            }
-
-            Log.d(TAG, msg);
-        }
-    };
+    private ObjectMapper objectMapper;
+    private Map<String, List<Cookie>> cookieStore = Maps.newHashMap();
+    private Map<String, Retrofit> map = Maps.newHashMap();
 
     private RestfulService() {
-        client = new OkHttpClient();
-        if (isSsl) {
-            enableSSL(client);
+
+        Interceptor headerInterceptor = chain -> {
+            // 以拦截到的请求为基础创建一个新的请求对象，然后插入Header
+            Request request = chain.request().newBuilder()
+                    .addHeader("Content-Type", "application/json")
+                    .addHeader("Accept", "application/json")
+                    .build();
+            // 开始请求
+            return chain.proceed(request);
+        };
+
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .addInterceptor(headerInterceptor)
+//                .connectTimeout(100, TimeUnit.SECONDS)
+//                .writeTimeout(100, TimeUnit.SECONDS)
+//                .readTimeout(100, TimeUnit.SECONDS)
+//                .retryOnConnectionFailure(true)
+                ;
+
+        if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+            loggingInterceptor.level(HttpLoggingInterceptor.Level.BODY);
+            builder.addInterceptor(loggingInterceptor);
         }
 
-        setRestfulCookieManager(new RestfulCookieManager());
+        client = builder.build();
+
+        objectMapper = new ObjectMapper();
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     public static RestfulService getInstance() {
         return SingletonHolder.instance;
     }
 
-    /**
-     * 设置默认restful服务器
-     *
-     * @param endpoint restful服务器。 形如 http://api.ismal.cn 或 http://api.ismal.cn:80 或
-     *                 http://api.ismal.cn:80/rest
-     */
-    public void setDefaultEndpoint(String endpoint) {
-        defaultHost = endpoint;
-        getAdapter(endpoint);
+    public String getDefaultHost() {
+        return defaultHost;
+    }
+
+    public void setDefaultHost(String defaultHost) {
+        this.defaultHost = defaultHost;
     }
 
     public OkHttpClient getClient() {
         return client;
-    }
-
-    public RestfulCookieManager getRestfulCookieManager() {
-        return restfulCookieManager;
-    }
-
-    public void setRestfulCookieManager(RestfulCookieManager restfulCookieManager) {
-        this.restfulCookieManager = restfulCookieManager;
-
-        CookieHandler.setDefault(restfulCookieManager);
-        restfulCookieManager.clean();
     }
 
     public <T> T createApi(Class<T> clazz) {
@@ -107,50 +108,36 @@ public class RestfulService extends AbstractService {
      * @return Restful Service 实例
      */
     public <T> T createApi(String endpoint, Class<T> clazz) {
-        RestAdapter adapter = getAdapter(endpoint);
-        return adapter.create(clazz);
+        Retrofit retrofit = getRetrofit(endpoint);
+        return retrofit.create(clazz);
     }
 
-    synchronized private RestAdapter getAdapter(String endpoint) {
+    synchronized private Retrofit getRetrofit(String endpoint) {
         if (map.containsKey(endpoint)) {
             return map.get(endpoint);
         } else {
-            ObjectMapper objMapper = new ObjectMapper();
-            objMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+            Retrofit.Builder builder = new Retrofit.Builder()
+                    .baseUrl(endpoint)
+                    .client(client)
+                    .addConverterFactory(JacksonConverterFactory.create(objectMapper));
 
-            RestAdapter.Builder builder = new RestAdapter.Builder();
-            builder.setConverter(new JacksonConverter(objMapper));
-
-            builder.setClient(new OkClient(client));
-            builder.setEndpoint(endpoint);
-            builder.setLog(restLog);
-            builder.setLogLevel(AppUtils.isDebug(cx)
-                    ? RestAdapter.LogLevel.FULL
-                    : RestAdapter.LogLevel.NONE);
-
-            if (restfulCookieManager != null) {
-                builder.setRequestInterceptor(restfulCookieManager.getRequestInterceptor());
-            }
-
-            RestAdapter adapter = builder.build();
-            map.put(endpoint, adapter);
-            return adapter;
+            return builder.build();
         }
     }
 
-    public void downFile(String url, final String fileName,
+    public void downFile(final String url,
+                         final String fileName,
                          final Callback<Uri> callback) {
         Request request = new Request.Builder().url(url).build();
 
-        client.newCall(request).enqueue(new com.squareup.okhttp.Callback() {
-
+        client.newCall(request).enqueue(new okhttp3.Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(@NotNull Call call, @NotNull IOException e) {
                 Helper.onFailure(callback, e);
             }
 
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
                 InputStream in = response.body().byteStream();
                 // Read the data from the stream
 
@@ -162,28 +149,24 @@ public class RestfulService extends AbstractService {
                 Helper.onSuccess(callback, uri);
             }
         });
-    }
-
-    private void enableSSL(OkHttpClient client) {
-        SSLContext sslContext;
-        try {
-            sslContext = SSLContext.getInstance("TLS");
-            sslContext.init(null, null, null);
-            client.setSslSocketFactory(sslContext.getSocketFactory());
-        } catch (Exception e) {
-            // The system has no TLS. Just give up.
-            e.printStackTrace();
-        }
 
     }
-
-
-    // -------------------------------------------------------------------------------
-    // RestAdapter.Log
-    // -------------------------------------------------------------------------------
 
     private static class SingletonHolder {
         private static RestfulService instance = new RestfulService();
     }
 
+
+    private CookieJar cookieJar = new CookieJar() {
+        @Override
+        public void saveFromResponse(HttpUrl url, List<Cookie> cookies) {
+            cookieStore.put(url.host(), cookies);
+        }
+
+        @Override
+        public List<Cookie> loadForRequest(HttpUrl url) {
+            List<Cookie> cookies = cookieStore.get(url.host());
+            return cookies != null ? cookies : Lists.newArrayList();
+        }
+    };
 }

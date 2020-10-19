@@ -1,4 +1,6 @@
+apply from: gradlesPath + "android-lib.gradle"
+
 dependencies {
-    api("meJreLibs:common:${meJavaLibraryVersion}")
-    api "androidx.appcompat:appcompat:" + rootProject.ext.androidxAppcompat
+    api "meJreLibs:common:${meJreLibsVersion}"
+    api "androidx.appcompat:appcompat:${androidxAppcompatVersion}"
 }

@@ -1,3 +1,6 @@
+apply from: gradlesPath + "android-lib.gradle"
+
+
 dependencies {
 }
 

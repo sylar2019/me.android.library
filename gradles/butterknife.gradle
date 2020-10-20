@@ -1,0 +1,21 @@
+//
+// butterknife 应用示例
+//@see https://github.com/JakeWharton/butterknife
+
+buildscript {
+    repositories {
+        maven { url REPO_ALIYUN_GOOGLE }
+        maven { url REPO_ALIYUN_JCENTER }
+    }
+    dependencies {
+        //butterknife
+        classpath "com.jakewharton:butterknife-gradle-plugin:${butterknifeVersion}"
+    }
+}
+
+apply plugin: 'com.jakewharton.butterknife'
+
+dependencies {
+    implementation "com.jakewharton:butterknife:${butterknifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterknifeVersion}"
+}

@@ -1,0 +1,2 @@
+set solib-search-path /Users/sylar/Documents/code/me/meAndroidLibs/utils/utils-serialport/obj/local/armeabi-v7a
+directory /Users/sylar/Library/Android/sdk/ndk/20.1.5948944/toolchains/llvm/prebuilt/darwin-x86_64/sysroot /Users/sylar/Documents/code/me/meAndroidLibs/utils/utils-serialport/jni /Users/sylar/Library/Android/sdk/ndk/20.1.5948944/sources/cxx-stl/system

@@ -1,0 +1,28 @@
+//
+// greendao 应用示例
+// @see https://github.com/greenrobot/greenDAO
+
+buildscript {
+    repositories {
+        maven { url REPO_ALIYUN_GOOGLE }
+        maven { url REPO_ALIYUN_JCENTER }
+    }
+    dependencies {
+        classpath "org.greenrobot:greendao-gradle-plugin:${greendaoVersion}"
+    }
+}
+
+apply plugin: 'org.greenrobot.greendao'
+
+dependencies {
+    api("org.greenrobot:greendao:${greendaoVersion}")
+}
+
+greendao {
+    //设置DaoMaster、DaoSession、Dao目录
+    targetGenDir 'src/main/java'
+    //版本号、升级时可配置 //TODO 可在具体项目中重载配置
+    //schemaVersion 1
+    //设置DaoMaster、DaoSession、Dao包名  //TODO 可在具体项目中重载配置
+    //daoPackage 'com.sample.common.db.dao'
+}

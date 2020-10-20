@@ -2,5 +2,5 @@ apply from: gradlesPath + "android-lib.gradle"
 
 dependencies {
     api project(':common')
-    api("org.greenrobot:greendao:3.2.2")
+    api("org.greenrobot:greendao:${greendaoVersion}")
 }

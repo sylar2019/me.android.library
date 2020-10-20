@@ -1,0 +1,18 @@
+//
+// aspectj 应用示例
+// @see https://github.com/HujiangTechnology/gradle_plugin_android_aspectjx
+
+buildscript {
+    repositories {
+        maven { url REPO_ALIYUN_GOOGLE }
+        maven { url REPO_ALIYUN_JCENTER }
+    }
+    dependencies {
+        classpath "com.hujiang.aspectjx:gradle-android-plugin-aspectjx:${aspectjVersion}"
+    }
+}
+
+apply plugin: 'android-aspectjx'
+
+dependencies {
+}

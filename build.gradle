@@ -36,16 +36,10 @@ allprojects {
 }
 
 subprojects {
-
-    configurations {
-        all*.exclude group: "org.slf4j", module: "log4j-over-slf4j"
-        all*.exclude group: "log4j", module: "log4j"
-    }
-
     configurations.all {
-        //不使用缓存，使用仓库中最新的包
-        resolutionStrategy.cacheDynamicVersionsFor 0, 'seconds'
-        resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+        resolutionStrategy {
+            force "com.google.guava:guava:${guavaVersion}"
+        }
     }
 }
 

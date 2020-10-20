@@ -1,0 +1,12 @@
+//
+// aspectj 应用示例
+// @see https://github.com/PhilJay/MPAndroidChart
+
+
+repositories {
+    maven { url REPO_JITPACK }
+}
+
+dependencies {
+    implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+}
